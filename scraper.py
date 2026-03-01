@@ -17,7 +17,7 @@ def setup_driver():
     return driver
 
 def open_imdb_2024(driver, start):
-    url = f"https://www.imdb.com/search/title/?year=2024&start={start}"
+    url = f"https://www.imdb.com/search/title/?title_type=feature&release_date=2024-01-01,2024-12-31&count=50"
     driver.get(url)
     time.sleep(3)
     
