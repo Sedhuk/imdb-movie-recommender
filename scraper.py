@@ -53,29 +53,24 @@ def get_storyline(driver, movie_url):
             storyline = "Not Available"
 
     return storyline
-
 def main():
     driver = setup_driver()
 
     all_movies = []
     start = 1
+    MAX_MOVIES = 1000
 
-    while True:
+    while len(all_movies) < MAX_MOVIES:
         print(f"Scraping page starting at {start}...")
 
-        open_imdb_2024(driver, start)
-
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@class,'ipc-title-link-wrapper')]"))
-            )
-        except:
-            print("No more movies found. Ending pagination.")
-            break
+        url = f"https://www.imdb.com/search/title/?title_type=feature&release_date=2024-01-01,2024-12-31&start={start}&count=50"
+        driver.get(url)
+        time.sleep(3)
 
         elements = driver.find_elements(By.XPATH, "//a[contains(@class,'ipc-title-link-wrapper')]")
 
         if not elements:
+            print("No more movies found.")
             break
 
         for elem in elements:
@@ -85,7 +80,10 @@ def main():
             if "/title/" in link:
                 all_movies.append((title, link))
 
-        start += 50  # Move to next page
+            if len(all_movies) >= MAX_MOVIES:
+                break
+
+        start += 50
         time.sleep(2)
 
     print(f"Total movies collected: {len(all_movies)}")
@@ -110,9 +108,9 @@ def main():
     driver.quit()
 
     df = pd.DataFrame(movie_data)
-    df.to_csv("imdb_2024_full_movies.csv", index=False)
+    df.to_csv("imdb_2024_1000_movies.csv", index=False)
 
-    print("Full 2024 data saved successfully!")
+    print("1000 movies data saved successfully!")
 
 if __name__ == "__main__":
     main()
